@@ -1,8 +1,10 @@
 package hangman;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.SortedSet;
 
 public class EvilHangman {
@@ -27,7 +29,7 @@ public class EvilHangman {
                 System.out.println(ex);
             }
 
-            runProgram(game, guesses);
+            runProgram(game, guesses, wordLength);
         }
         else {
             System.out.println("Usage: java [your main class name] dictionary wordLength guesses");
@@ -37,7 +39,6 @@ public class EvilHangman {
     public static void printRound(String wordPattern, int guesses, SortedSet<Character> guessedLetters) {
         System.out.println("You have " + guesses + " guesses left");
         System.out.println("Used letters: ");
-        //System.out.println("guessedLetters.size()  = " + guessedLetters.size());
         if(guessedLetters.size() > 0) {
             for(Character c : guessedLetters) {
                 System.out.print(c + " ");
@@ -46,10 +47,41 @@ public class EvilHangman {
         System.out.println("Word: " + wordPattern);
     }
 
-    public static void runProgram(EvilHangmanGame game, int guesses) {
+    public static void printSecondPartOfRound(boolean guessedCorrectly, char guessAsChar, String wordPattern) {
+        if (guessedCorrectly) {
+            int numCharsFound = 0;
+            for (int i = 0; i < wordPattern.length(); i++) {
+                if (wordPattern.charAt(i) == guessAsChar) {
+                    numCharsFound++;
+                }
+            }
+
+            if (numCharsFound > 1) {
+                System.out.print("Yes, there are " + numCharsFound + "'s\n\n");
+            } else {
+                System.out.print("Yes, there is " + numCharsFound + "\n\n");
+            }
+
+        } else {
+            System.out.print("Sorry, there are no " + guessAsChar + "'s\n\n");
+        }
+    }
+
+    public static void printEndOfGame(boolean theyWon, Set<String> resultsOfFinalGuess, String wordPatten) {
+        if (theyWon) {
+            System.out.println("You Win!");
+            System.out.println("The word was: " + wordPatten);
+        } else {
+            System.out.println("You Lose!");
+            System.out.println("The word was: " + resultsOfFinalGuess.iterator().next());
+        }
+    }
+
+    public static void runProgram(EvilHangmanGame game, int guesses, int wordLength) {
         String stringPattern = game.getFirstPattern();
         SortedSet<Character> guessedLetters = game.getGuessedLetters();
         printRound(stringPattern, guesses, guessedLetters);
+        Set<String> results;
 
         while(guesses > 0) {
             Scanner scanner = new Scanner(System.in);
@@ -58,13 +90,43 @@ public class EvilHangman {
             char guessAsChar = 0;
 
             if (guessAsCharString.length() > 1) {
-                System.out.println("Guess must be one letter. Try again");
+                System.out.println("“Invalid input”");
                 continue;
             }
             guessAsChar = guessAsCharString.charAt(0);
             if (!Character.isLetter(guessAsChar)) {
-                System.out.println("Guess must be a letter. Try again");
+                System.out.println("“Invalid input”");
                 continue;
+            }
+
+            try {
+                results = game.makeGuess(guessAsChar);
+                stringPattern = game.wordPattern;
+
+                if (stringPattern.contains(guessAsCharString)) {
+                    printSecondPartOfRound(true, guessAsChar, game.wordPattern);
+                }  else {
+                    printSecondPartOfRound(false, guessAsChar, game.wordPattern);
+                }
+
+
+                int count = 0;
+                for (int i = 0; i < stringPattern.length(); i++) {
+                    if (stringPattern.charAt(i) != '-') {
+                        count++;
+                    }
+                }
+
+                if (count == wordLength) {
+                    printEndOfGame(true, results, game.wordPattern); // They win
+                } else if (guesses == 0) {
+                    printEndOfGame(false, results, game.wordPattern); // They lost
+                }
+                guesses--;
+                printRound(game.wordPattern, guesses, game.getGuessedLetters());
+
+            } catch(GuessAlreadyMadeException ex) {
+                System.out.println(ex);
             }
 
         }

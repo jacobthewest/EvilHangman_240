@@ -95,6 +95,10 @@ public class EvilHangman {
                 System.out.println("“Invalid input”");
                 continue;
             }
+            if(guessAsCharString.equals("\r") || guessAsCharString.equals("\n") || guessAsCharString.equals("")) {
+                System.out.println("Invalid input");
+                continue;
+            }
             guessAsChar = guessAsCharString.charAt(0);
             if (!Character.isLetter(guessAsChar)) {
                 System.out.println("“Invalid input”");

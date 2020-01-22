@@ -92,7 +92,7 @@ public class EvilHangman {
             char guessAsChar = 0;
 
             if (guessAsCharString.length() > 1) {
-                System.out.println("“Invalid input”");
+                System.out.println("Invalid input");
                 continue;
             }
             if(guessAsCharString.equals("\r") || guessAsCharString.equals("\n") || guessAsCharString.equals("")) {
@@ -101,7 +101,7 @@ public class EvilHangman {
             }
             guessAsChar = guessAsCharString.charAt(0);
             if (!Character.isLetter(guessAsChar)) {
-                System.out.println("“Invalid input”");
+                System.out.println("Invalid input");
                 continue;
             }
 
